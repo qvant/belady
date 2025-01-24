@@ -17,29 +17,7 @@ public class Main {
         int beladyAnomalies = 0;
         for (int i = 0; i < RUNS_NUMBER; i++) {
             show("Run : " + (i + 1));
-            int[] pageSequence = new int[ACCESS_SEQUENCE_SIZE];
-            if (USE_FIXED_SEQUENCE) {
-                pageSequence = FIXED_SEQUENCE;
-            } else {
-                for (int j = 0; j < ACCESS_SEQUENCE_SIZE; j++) {
-                    pageSequence[j] = (int) (Math.random() * PAGE_NUMBER);
-                }
-                if (POPULAR_VALUES_NUMBER > 0) {
-                    int[] popularValues = new int[POPULAR_VALUES_NUMBER];
-                    for (int j = 0; j < POPULAR_VALUES_NUMBER; j++) {
-                        popularValues[j] = pageSequence[j];
-                    }
-                    for (int j = 0; j < pageSequence.length; j++) {
-                        int curVal = pageSequence[j];
-                        if (Arrays.stream(popularValues).anyMatch(x -> x == curVal)) {
-                            if (Math.random() < POPULAR_VALUES_RATE) {
-                                pageSequence[j] = popularValues[(int) (Math.random() * POPULAR_VALUES_NUMBER)];
-                            }
-                        }
-                    }
-                }
-            }
-            show("Page sequence: " + Arrays.toString(pageSequence));
+            int[] pageSequence = makeAccessSequence();
             initBuffer(bufferSmall);
             initBuffer(bufferLarge);
             int pageFaultsSmall = emulate(bufferSmall, pageSequence);
@@ -73,8 +51,8 @@ public class Main {
     }
 
     private static boolean isPageFault(int[] buffer, int pageNumber) {
-        for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] == pageNumber) {
+        for (int i  : buffer) {
+            if (i == pageNumber) {
                 return false;
             }
         }
@@ -95,9 +73,32 @@ public class Main {
     }
 
     private static void initBuffer(int[] buffer) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = -1;
+        Arrays.fill(buffer, -1);
+    }
+
+    private static int[] makeAccessSequence(){
+        int[] pageSequence = new int[ACCESS_SEQUENCE_SIZE];
+        if (USE_FIXED_SEQUENCE) {
+            pageSequence = FIXED_SEQUENCE;
+        } else {
+            for (int i = 0; i < ACCESS_SEQUENCE_SIZE; i++) {
+                pageSequence[i] = (int) (Math.random() * PAGE_NUMBER);
+            }
+            if (POPULAR_VALUES_NUMBER > 0) {
+                int[] popularValues = new int[POPULAR_VALUES_NUMBER];
+                System.arraycopy(pageSequence, 0, popularValues, 0, POPULAR_VALUES_NUMBER);
+                for (int j = 0; j < pageSequence.length; j++) {
+                    int curVal = pageSequence[j];
+                    if (Arrays.stream(popularValues).anyMatch(x -> x == curVal)) {
+                        if (Math.random() < POPULAR_VALUES_RATE) {
+                            pageSequence[j] = popularValues[(int) (Math.random() * POPULAR_VALUES_NUMBER)];
+                        }
+                    }
+                }
+            }
         }
+        show("Page sequence: " + Arrays.toString(pageSequence));
+        return pageSequence;
     }
 
     private static void show(Object obj) {
