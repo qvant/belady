@@ -9,18 +9,18 @@ public class Main {
     private static final int POPULAR_VALUES_NUMBER = 2;
     private static final double POPULAR_VALUES_RATE = 0.4;
     private static final boolean USE_FIXED_SEQUENCE = true;
-    private static final int[] FIXED_SEQUENCE = new int[] {1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5};
+    private static final int[] FIXED_SEQUENCE = new int[]{1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5};
+
     public static void main(String[] args) {
         int[] bufferSmall = new int[BUFFER_SIZE_SMALL];
         int[] bufferLarge = new int[BUFFER_SIZE_LARGE];
         int beladyAnomalies = 0;
-        for(int i = 0; i < RUNS_NUMBER; i++){
-            show("Run : " +  (i + 1));
+        for (int i = 0; i < RUNS_NUMBER; i++) {
+            show("Run : " + (i + 1));
             int[] pageSequence = new int[ACCESS_SEQUENCE_SIZE];
-            if (USE_FIXED_SEQUENCE){
+            if (USE_FIXED_SEQUENCE) {
                 pageSequence = FIXED_SEQUENCE;
-            }
-            else {
+            } else {
                 for (int j = 0; j < ACCESS_SEQUENCE_SIZE; j++) {
                     pageSequence[j] = (int) (Math.random() * PAGE_NUMBER);
                 }
@@ -46,7 +46,7 @@ public class Main {
             show("Page faults for small buffer: " + pageFaultsSmall);
             int pageFaultsLarge = emulate(bufferLarge, pageSequence);
             show("Page faults for large buffer: " + pageFaultsLarge);
-            if (pageFaultsSmall < pageFaultsLarge){
+            if (pageFaultsSmall < pageFaultsLarge) {
                 show("Belady anomaly seen!");
                 beladyAnomalies++;
             }
@@ -55,17 +55,16 @@ public class Main {
 
     }
 
-    private static int emulate(int[] buffer, int[]pageSequence){
+    private static int emulate(int[] buffer, int[] pageSequence) {
         int pageFaults = 0;
-        for(int i = 0; i < ACCESS_SEQUENCE_SIZE; i++){
-            show("Step " + i);
+        for (int i = 0; i < ACCESS_SEQUENCE_SIZE; i++) {
+            show("Step " + (i + 1));
             show("Looking for page " + pageSequence[i]);
             if (isPageFault(buffer, pageSequence[i])) {
                 show("Page fault!");
                 pageFaults++;
                 putPageToBuffer(buffer, pageSequence[i]);
-            }
-            else{
+            } else {
                 show("Page hit!");
             }
             show("Buffer:" + Arrays.toString(buffer));
@@ -73,35 +72,35 @@ public class Main {
         return pageFaults;
     }
 
-    private static boolean isPageFault(int[] buffer, int pageNumber){
-        for(int i = 0; i < buffer.length; i++){
-            if (buffer[i] == pageNumber){
+    private static boolean isPageFault(int[] buffer, int pageNumber) {
+        for (int i = 0; i < buffer.length; i++) {
+            if (buffer[i] == pageNumber) {
                 return false;
             }
         }
         return true;
     }
 
-    private static void putPageToBuffer(int[] buffer, int pageNumber){
-        for(int i = 0; i < buffer.length; i++){
-            if (buffer[i] <0){
+    private static void putPageToBuffer(int[] buffer, int pageNumber) {
+        for (int i = 0; i < buffer.length; i++) {
+            if (buffer[i] < 0) {
                 buffer[i] = pageNumber;
                 return;
             }
         }
-        for(int i = 1; i < buffer.length; i++){
+        for (int i = 1; i < buffer.length; i++) {
             buffer[i - 1] = buffer[i];
         }
         buffer[buffer.length - 1] = pageNumber;
     }
 
-    private static void initBuffer(int[] buffer){
-        for(int i = 0; i < buffer.length; i++){
-           buffer[i] = -1;
+    private static void initBuffer(int[] buffer) {
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = -1;
         }
     }
 
-    private static void show(Object obj){
+    private static void show(Object obj) {
         System.out.println(obj);
     }
 }
